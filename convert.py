@@ -66,7 +66,7 @@ class BeatmapConverter:
         if len(difficulty) == 2:
             difficulty = '0' + difficulty
         difficulty = round_base(
-            float(difficulty[:1] + '.' + difficulty[1:]), 0.2)
+            float(difficulty[:1] + '.' + difficulty[1:]), 0.2, index=True)
 
         # Get timing points
         timing_points = []
