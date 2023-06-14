@@ -141,9 +141,9 @@ class BeatmapConverter:
 
         # Create beat phase tensor
         beat_phase = self.get_beat_phase(torch.arange(
-            len(specs)) * self.hop_ms, offset, beat_length)
+            specs.shape[1]) * self.hop_ms, offset, beat_length)
         beat_num = self.get_beat_num(torch.arange(
-            len(specs)) * self.hop_ms, beat_length, 4, offset)
+            specs.shape[1]) * self.hop_ms, beat_length, 4, offset)
 
         return specs, beat_phase, beat_num
 
@@ -246,6 +246,7 @@ class BeatmapConverter:
             if not specs.shape[1] == len(beat_phase) == len(beat_num) == len(actions) == len(onsets):
                 log.write(
                     f'ERROR {osu_fn.name}: Features dimensions mismatch. Skipping conversion.\n')
+                move_file(osu_fn, excluded_osu_path / osu_fn.name)
                 continue
 
             torch.save({'actions': actions, 'onsets': onsets, 'beatmap': beatmap, 'difficulty': difficulty},
