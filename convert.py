@@ -143,9 +143,9 @@ class BeatmapConverter:
 
         # Create beat phase tensor
         beat_phase = self.get_beat_phase(torch.arange(
-            specs.shape[1]) * self.hop_ms, offset, beat_length)
+            specs.shape[1]) * self.hop_ms, offset, beat_length).int()
         beat_num = self.get_beat_num(torch.arange(
-            specs.shape[1]) * self.hop_ms, beat_length, 4, offset)
+            specs.shape[1]) * self.hop_ms, beat_length, 4, offset).int()
 
         return specs, beat_phase, beat_num
 
@@ -169,7 +169,7 @@ class BeatmapConverter:
             actions[int(timestep), int(key_number)] = note_type
 
         actions = torch.tensor([combination_to_index(
-            obj.tolist(), num_keys) for obj in actions])
+            obj.tolist(), num_keys) for obj in actions]).int()
         onsets = actions.bool().int()
 
         return actions, onsets
