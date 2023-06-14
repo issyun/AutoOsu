@@ -63,6 +63,8 @@ class BeatmapConverter:
 
         # Get difficulty (round to .2)
         difficulty = fn.name.split('-')[1]
+        if len(difficulty) == 2:
+            difficulty = '0' + difficulty
         difficulty = round_base(
             float(difficulty[:1] + '.' + difficulty[1:]), 0.2)
 
