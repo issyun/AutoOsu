@@ -31,3 +31,9 @@ def move_file(old_path:Path, new_path:Path, overwrite=True):
             old_path.unlink()
     else:
         old_path.rename(new_path)
+
+def find_file_by_stem(fn_list, stem):
+        for fn in fn_list:
+            if fn.stem == stem:
+                return fn
+        return -1

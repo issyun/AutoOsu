@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import torchaudio
 from tqdm.auto import tqdm
-from utils import round_base, combination_to_index, move_file
+from utils import round_base, combination_to_index, move_file, find_file_by_stem
 
 is_macos = platform == 'darwin'
 torch.set_printoptions(sci_mode=False)
@@ -171,12 +171,6 @@ class BeatmapConverter:
 
         return actions, onsets
 
-    def find_file_by_stem(self, fn_list, stem):
-        for fn in fn_list:
-            if fn.stem == stem:
-                return fn
-        return -1
-
     def convert(self):
         audio_suffixes = {'.mp3', '.MP3', '.wav', '.WAV', '.ogg', '.OGG'}
         audio_fns = sorted([p for p in self.audio_path.glob(
@@ -209,13 +203,13 @@ class BeatmapConverter:
 
             # Check if corresponding audio has already been converted
             audio_stem = osu_fn.stem.split('-')[0]
-            converted_audio_fn = self.find_file_by_stem(
+            converted_audio_fn = find_file_by_stem(
                 list(self.audio_output_path.glob('*.pt')), audio_stem)
 
             num_timesteps = 0
             if converted_audio_fn == -1:  # If audio hasn't been converted...
                 # Load audio with OS-specific backend
-                audio_fn = self.find_file_by_stem(audio_fns, audio_stem)
+                audio_fn = find_file_by_stem(audio_fns, audio_stem)
                 if audio_fn == -1:
                     log.write(
                         f'ERROR {osu_fn.name}: Audio file not found. Skipping conversion.\n')
