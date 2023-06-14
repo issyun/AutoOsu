@@ -2,6 +2,7 @@ from sys import platform
 from pathlib import Path
 from time import localtime, strftime
 from math import floor
+import argparse
 import torch
 import torch.nn as nn
 import torchaudio
@@ -253,3 +254,21 @@ class BeatmapConverter:
                        (num_keys_path / f'{osu_fn.stem}.pt'))
 
         log.close()
+
+def main(args):
+    osu_path = Path(args.beatmap_in)
+    audio_path = Path(args.audio_in)
+    beatmap_output_path = osu_path if args.beatmap_out == '' else Path(args.beatmap_out)
+    audio_output_path = audio_path if args.audio_out == '' else Path(args.audio_out)
+
+    converter = BeatmapConverter(osu_path, audio_path, beatmap_output_path, audio_output_path)
+    converter.convert()
+
+if __name__ == '__main__':
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument('--beatmap_in', type=str, default='osu_dataset')
+    argparser.add_argument('--audio_in', type=str, default='osu_dataset')
+    argparser.add_argument('--beatmap_out', type=str, default='')
+    argparser.add_argument('--audio_out', type=str, default='')
+    args = argparser.parse_args()
+    main(args)
