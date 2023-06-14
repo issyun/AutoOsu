@@ -232,22 +232,20 @@ class BeatmapConverter:
                 # Convert audio and save
                 specs, beat_phase, beat_num = self.convert_audio(
                     y, offset, beat_length)
-                num_timesteps = len(specs)
                 torch.save({'specs': specs, 'beat_phase': beat_phase, 'beat_num': beat_num},
                            (self.audio_output_path / f'{audio_fn.stem}.pt'))
 
             else:  # If audio has already been converted...
                 specs, beat_phase, beat_num = torch.load(
                     converted_audio_fn).values()
-                num_timesteps = len(specs)
 
+            num_timesteps = specs.shape[1]
             # Quantize beatmap and save
             actions, onsets = self.quantize_beatmap(
                 beatmap, num_timesteps, num_keys)
             if not specs.shape[1] == len(beat_phase) == len(beat_num) == len(actions) == len(onsets):
                 log.write(
                     f'ERROR {osu_fn.name}: Features dimensions mismatch. Skipping conversion.\n')
-                move_file(osu_fn, excluded_osu_path / osu_fn.name)
                 continue
 
             torch.save({'actions': actions, 'onsets': onsets, 'beatmap': beatmap, 'difficulty': difficulty},
