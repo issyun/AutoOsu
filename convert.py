@@ -127,7 +127,7 @@ class BeatmapConverter:
         """
         Converts audio into 3-channel mel-spectrogram with context windows.
         INPUT: waveform of sr=44100, offset, beat length
-        RETURNS: Spectrogram: Tensor([num_timesteps, 80, 3]),
+        RETURNS: Spectrogram: Tensor([3, num_timesteps, 80]),
                  Beat phase: Tensor([num_timesteps]),
                  Beat num: Tensor([num_timesteps])
         """
@@ -137,7 +137,7 @@ class BeatmapConverter:
         for converter in self.melspec_converters:
             melspec = converter(y + eps)
             specs.append(torch.log(melspec.T))
-        specs = torch.stack(specs, dim=-1)  # len X 80 X 3
+        specs = torch.stack(specs, dim=0)  # 3 X len X 80
 
         # Create beat phase tensor
         beat_phase = self.get_beat_phase(torch.arange(
@@ -244,7 +244,7 @@ class BeatmapConverter:
             # Quantize beatmap and save
             actions, onsets = self.quantize_beatmap(
                 beatmap, num_timesteps, num_keys)
-            if not len(specs) == len(beat_phase) == len(beat_num) == len(actions) == len(onsets):
+            if not specs.shape[1] == len(beat_phase) == len(beat_num) == len(actions) == len(onsets):
                 log.write(
                     f'ERROR {osu_fn.name}: Features dimensions mismatch. Skipping conversion.\n')
                 move_file(osu_fn, excluded_osu_path / osu_fn.name)
