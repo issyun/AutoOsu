@@ -27,13 +27,15 @@ def move_file(old_path:Path, new_path:Path, overwrite=True):
         if overwrite:
             new_path.unlink()
             old_path.rename(new_path)
-        else:
+        elif old_path.exists():
             old_path.unlink()
-    else:
+    elif old_path.exists():
         old_path.rename(new_path)
 
-def find_file_by_stem(fn_list, stem):
+def find_file_by_stem(fn_list, stem, substring=False):
         for fn in fn_list:
-            if fn.stem == stem:
+            if substring and stem in fn.stem:
+                return fn
+            elif not substring and fn.stem == stem:
                 return fn
         return -1
