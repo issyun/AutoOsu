@@ -177,12 +177,14 @@ class BeatmapConverter:
     def convert(self):
         audio_suffixes = {'.mp3', '.MP3', '.wav', '.WAV', '.ogg', '.OGG'}
         audio_fns = sorted([p for p in self.audio_path.glob(
-            '**/*') if p.suffix in audio_suffixes])
+            '*') if p.suffix in audio_suffixes])
         osu_fns = sorted(list(self.osu_path.glob('*.osu')))
 
         # Create needed paths
         excluded_osu_path = self.osu_path / 'excluded_osu'
         excluded_osu_path.mkdir(exist_ok=True)
+        excluded_audio_path = self.audio_path / 'excluded_audio'
+        excluded_audio_path.mkdir(exist_ok=True)
         num_keys_paths = []  # Separate converted beatmaps by num_keys
 
         log = open(self.beatmap_output_path /
@@ -219,10 +221,17 @@ class BeatmapConverter:
                     move_file(osu_fn, excluded_osu_path / osu_fn.name)
                     continue
 
-                if is_macos:
-                    y, sr = torchaudio.load(audio_fn, backend='ffmpeg')
-                else:
-                    y, sr = torchaudio.load(audio_fn)
+                try:
+                    if is_macos:
+                        y, sr = torchaudio.load(audio_fn, backend='ffmpeg')
+                    else:
+                        y, sr = torchaudio.load(audio_fn)
+                except BaseException as err:
+                    log.write(f'ERROR {audio_fn.name}: Load error. Skipping conversion.\n')
+                    log.write(f'({err})\n')
+                    move_file(osu_fn, excluded_osu_path / osu_fn.name)
+                    move_file(audio_fn, excluded_audio_path / audio_fn.name)
+                    continue
 
                 # Mono and resample
                 y = y.mean(dim=0)
@@ -241,10 +250,17 @@ class BeatmapConverter:
                 specs, beat_phase, beat_num = torch.load(
                     converted_audio_fn).values()
 
-            num_timesteps = specs.shape[1]
             # Quantize beatmap and save
-            actions, onsets = self.quantize_beatmap(
-                beatmap, num_timesteps, num_keys)
+            num_timesteps = specs.shape[1]
+            try:
+                actions, onsets = self.quantize_beatmap(
+                    beatmap, num_timesteps, num_keys)
+            except BaseException as err:
+                log.write(f'ERROR {osu_fn.name}: Quantization error. Skipping conversion.\n')
+                log.write(f'({err})\n')
+                move_file(osu_fn, excluded_osu_path / osu_fn.name)
+                continue
+
             if not specs.shape[1] == len(beat_phase) == len(beat_num) == len(actions) == len(onsets):
                 log.write(
                     f'ERROR {osu_fn.name}: Features dimensions mismatch. Skipping conversion.\n')
