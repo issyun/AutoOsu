@@ -162,7 +162,7 @@ class BeatmapConverter:
         timesteps = round_base(beatmap_new[:, 0], self.hop_ms) / self.hop_ms
         beatmap_new[:, 0] = timesteps
 
-        # Create action tensor whose length matches with spectrogram
+        # Create action tensor whose length matches that of spectrogram
         actions = torch.zeros([num_timesteps, num_keys])
         for obj in beatmap_new:
             timestep, key_number, note_type = obj.tolist()
