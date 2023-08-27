@@ -1,3 +1,5 @@
 osu_dataset/
 .DS_Store
 __pycache__/
+wandb/
+checkpoints/convstack/unused/
