@@ -1,0 +1,26 @@
+train:
+  model: control
+  beatmap_dir: osu_dataset/beatmap/
+  audio_dir: osu_dataset/audio/
+  checkpoint_path: checkpoints/no_audio_context/
+  log_to_wandb: True
+  run_name: control
+  random_seed: 1
+
+hyperparams:
+  bp_emb_dim: 32
+  bn_emb_dim: 16
+  diff_emb_dim: 16
+  np_hidden_size: 256
+  np_num_layers: 2
+  ns_pre_proj_size: 32
+  ns_hidden_size: 256
+  ns_num_layers: 2
+  action_emb_dim: 32
+  np_fl_gamma: 2
+  np_fl_weight: 0.8
+  ns_fl_gamma: 3
+  ns_fl_weight: 0.5
+  learning_rate: 0.0005
+  batch_size: 24
+  num_epochs: 180
