@@ -4,7 +4,7 @@ train:
   audio_dir: osu_dataset/audio/
   checkpoint_path: checkpoints/no_audio_context/
   log_to_wandb: True
-  run_name: control
+  run_name: control-2
   random_seed: 1
 
 hyperparams:

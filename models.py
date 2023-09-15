@@ -162,8 +162,13 @@ class ControlModel(nn.Module):
                              bidirectional=True)
         self.np_proj_1 = nn.Linear(self.np_hidden_size*2, 128)
         self.np_proj_2 = nn.Linear(128, 1)
+        self.ns_pre_proj = nn.Sequential(
+            nn.Linear(1, self.ns_pre_proj_size),
+            nn.ReLU(),
+            nn.Linear(self.ns_pre_proj_size, self.ns_pre_proj_size),
+            nn.ReLU()
+        )
 
-        self.ns_pre_proj = nn.Linear(128, self.ns_pre_proj_size)
         self.ns_gru = nn.GRU(input_size=self.ns_pre_proj_size + self.bp_emb_dim + self.bn_emb_dim + self.diff_emb_dim + self.action_emb_dim,
                              hidden_size=self.ns_hidden_size,
                              num_layers=self.ns_num_layers,
@@ -183,16 +188,16 @@ class ControlModel(nn.Module):
         np_in = torch.cat([conv_outs, bp_emb, bn_emb, diff_proj], dim=-1)
         np_out, _ = self.np_gru(np_in)
         np_proj_1_out = self.gelu(self.np_proj_1(np_out))
-        np_pred = self.sigmoid(self.np_proj_2(np_proj_1_out)).squeeze()
+        np_pred = self.sigmoid(self.np_proj_2(np_proj_1_out))
 
         return conv_outs, bp_emb, bn_emb, diff_proj, np_proj_1_out, np_pred
 
     def forward(self, specs, beat_phases, beat_nums, difficulties, actions):
-        _, bp_emb, bn_emb, diff_proj, np_proj_1_out, np_pred = self.np_forward(
+        _, bp_emb, bn_emb, diff_proj, _, np_pred = self.np_forward(
             specs, beat_phases, beat_nums, difficulties)
         
         # ========== Note Selection ========== #
-        ns_pre_proj = self.gelu(self.ns_pre_proj(np_proj_1_out))
+        ns_pre_proj = self.ns_pre_proj(np_pred)
         action_emb = self.action_emb(actions)
         ns_in = torch.cat(
             [ns_pre_proj, bp_emb, bn_emb, diff_proj, action_emb], dim=-1)
@@ -201,7 +206,7 @@ class ControlModel(nn.Module):
         ns_proj_1_out = self.gelu(self.ns_proj_1(ns_out))
         ns_logit = self.ns_proj_2(ns_proj_1_out)
 
-        return np_pred, ns_logit
+        return np_pred.squeeze(), ns_logit
 
     def infer(self, specs, beat_phases, beat_nums, difficulties):
         _, bp_emb, bn_emb, diff_proj, np_proj_1_out, _ = self.np_forward(
