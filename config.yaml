@@ -1,6 +1,6 @@
 train:
   model: control
-  beatmap_dir: osu_dataset/beatmap/
+  beatmap_dir: osu_dataset/beatmap/4keys/
   audio_dir: osu_dataset/audio/
   checkpoint_path: checkpoints/no_audio_context/
   log_to_wandb: True
