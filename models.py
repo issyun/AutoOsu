@@ -12,8 +12,8 @@ class OsuModel(nn.Module):
         self.ns_pre_proj_size = hyperparams['ns_pre_proj_size']
         self.ns_hidden_size = hyperparams['ns_hidden_size']
         self.ns_num_layers = hyperparams['ns_num_layers']
-        self.num_tokens = hyperparams['num_tokens']
         self.action_emb_dim = hyperparams['action_emb_dim']
+        self.num_tokens = 256
 
         self.gelu = nn.GELU()
         self.sigmoid = nn.Sigmoid()
@@ -126,8 +126,8 @@ class ControlModel(nn.Module):
         self.ns_pre_proj_size = hyperparams['ns_pre_proj_size']
         self.ns_hidden_size = hyperparams['ns_hidden_size']
         self.ns_num_layers = hyperparams['ns_num_layers']
-        self.num_tokens = hyperparams['num_tokens']
         self.action_emb_dim = hyperparams['action_emb_dim']
+        self.num_tokens = 256
 
         self.gelu = nn.GELU()
         self.sigmoid = nn.Sigmoid()

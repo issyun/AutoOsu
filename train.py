@@ -117,7 +117,7 @@ class Trainer():
                     actions_gt = actions[:, 1:].to(self.device)
                     actions_shifted = actions[:, :-1].to(self.device)
 
-                    np_pred, ns_logit, _ = self.model(
+                    np_pred, ns_logit = self.model(
                         specs, beat_phases, beat_nums, difficulties, actions_shifted)
 
                     np_pred = torch.reshape(np_pred, [-1])
