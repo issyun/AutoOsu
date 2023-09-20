@@ -1,10 +1,16 @@
-train:
+experiment_config:
   model: control
+  train: False
+  validate: True
   beatmap_dir: osu_dataset/beatmap/4keys/
   audio_dir: osu_dataset/audio/
-  checkpoint_path: checkpoints/no_audio_context/
-  log_to_wandb: True
-  run_name: control-2
+  # load_checkpoint: checkpoints/default/09-17-03-11-49-epoch179.pt
+  load_checkpoint: checkpoints/control/09-15-16-32-11-epoch179.pt
+  save_checkpoint: False
+  checkpoint_path: checkpoints/default/
+  log_to_wandb: False
+  print_metrics: True
+  run_name: default-1
   random_seed: 1
 
 hyperparams:
@@ -23,4 +29,4 @@ hyperparams:
   ns_fl_weight: 0.5
   learning_rate: 0.0005
   batch_size: 24
-  num_epochs: 180
+  num_epochs: 1

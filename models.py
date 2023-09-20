@@ -209,10 +209,10 @@ class ControlModel(nn.Module):
         return np_pred.squeeze(), ns_logit
 
     def infer(self, specs, beat_phases, beat_nums, difficulties):
-        _, bp_emb, bn_emb, diff_proj, np_proj_1_out, _ = self.np_forward(
+        _, bp_emb, bn_emb, diff_proj, _, np_pred = self.np_forward(
             specs, beat_phases, beat_nums, difficulties)
 
-        ns_pre_proj = self.gelu(self.ns_pre_proj(np_proj_1_out))
+        ns_pre_proj = self.gelu(self.ns_pre_proj(np_pred))
         out = torch.zeros([specs.shape[0], specs.shape[2]])
         action_emb = self.action_emb(torch.zeros([specs.shape[0], 1], dtype=torch.long))
         last_hidden = torch.zeros([2, specs.shape[0], 256])
