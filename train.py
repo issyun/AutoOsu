@@ -8,7 +8,7 @@ import hydra
 from omegaconf import DictConfig, OmegaConf
 import wandb
 from dataset import OsuDataset, collate
-from models import OsuModel, ControlModel
+from models import OsuModel, ControlModel, OsuModelNpPred
 from loss import binary_focal_loss, multi_focal_loss
 
 DEV = 'cpu'
@@ -199,6 +199,9 @@ def main(config: DictConfig):
         model = OsuModel(hyperparams)
     elif experiment_config.model == 'control':
         model = ControlModel(hyperparams)
+    elif experiment_config.model == 'np_pred':
+        model = OsuModelNpPred(hyperparams)
+        print("Using NP Pred Model...")
 
     optimizer = torch.optim.Adam(
         model.parameters(), lr=hyperparams.learning_rate)

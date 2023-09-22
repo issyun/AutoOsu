@@ -1,11 +1,13 @@
 experiment_config:
-  model: control
+  model: np_pred
   train: False
   validate: True
   beatmap_dir: osu_dataset/beatmap/4keys/
   audio_dir: osu_dataset/audio/
+  # load_checkpoint: null
   # load_checkpoint: checkpoints/default/09-17-03-11-49-epoch179.pt
-  load_checkpoint: checkpoints/control/09-15-16-32-11-epoch179.pt
+  # load_checkpoint: checkpoints/control/09-15-16-32-11-epoch179.pt
+  load_checkpoint: checkpoints/default/np_pred-09-21-00-35-23-epoch179.pt
   save_checkpoint: False
   checkpoint_path: checkpoints/default/
   log_to_wandb: False

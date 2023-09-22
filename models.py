@@ -109,6 +109,65 @@ class OsuModel(nn.Module):
             action_emb = self.action_emb(ns_pred)
             
         return out
+    
+class OsuModelNpPred(OsuModel):
+    def __init__(self, hyperparams):
+        super().__init__(hyperparams)
+
+        self.ns_pre_proj = nn.Sequential(
+            nn.Linear(1, self.ns_pre_proj_size),
+            nn.ReLU(),
+            nn.Linear(self.ns_pre_proj_size, self.ns_pre_proj_size),
+            nn.ReLU()
+        )
+        
+        self.ns_gru = nn.GRU(input_size=320 + self.ns_pre_proj_size + self.bp_emb_dim + self.bn_emb_dim + self.diff_emb_dim + self.action_emb_dim,
+                      hidden_size=self.ns_hidden_size,
+                      num_layers=self.ns_num_layers,
+                      batch_first=True,
+                      bidirectional=False)
+        
+
+    def forward(self, specs, beat_phases, beat_nums, difficulties, actions):
+        conv_outs, bp_emb, bn_emb, diff_proj, _, np_pred = self.np_forward(
+            specs, beat_phases, beat_nums, difficulties)
+        
+        # ========== Note Selection ========== #
+
+        # ns_pre_proj = self.gelu(self.ns_pre_proj(np_proj_1_out))
+        ns_pre_proj = self.ns_pre_proj(np_pred.unsqueeze(-1))
+        action_emb = self.action_emb(actions)
+        ns_in = torch.cat(
+            [conv_outs, ns_pre_proj, bp_emb, bn_emb, diff_proj, action_emb], dim=-1)
+        ns_out, _ = self.ns_gru(ns_in)
+
+        ns_proj_1_out = self.gelu(self.ns_proj_1(ns_out))
+        ns_logit = self.ns_proj_2(ns_proj_1_out)
+
+        return np_pred, ns_logit
+
+    def infer(self, specs, beat_phases, beat_nums, difficulties):
+        conv_outs, bp_emb, bn_emb, diff_proj, _, np_pred = self.np_forward(
+            specs, beat_phases, beat_nums, difficulties)
+
+        # ns_pre_proj = self.gelu(self.ns_pre_proj(np_proj_1_out))
+        ns_pre_proj = self.ns_pre_proj(np_pred.unsqueeze(-1))
+        out = torch.zeros([specs.shape[0], specs.shape[2]])
+        action_emb = self.action_emb(torch.zeros([specs.shape[0], 1], dtype=torch.long))
+        last_hidden = torch.zeros([2, specs.shape[0], 256])
+        ns_in = torch.cat([conv_outs, ns_pre_proj, bp_emb, bn_emb, diff_proj], dim=-1)
+
+        for i in range(specs.shape[2]):
+            ns_in_temp = torch.cat([ns_in[:, i:i+1], action_emb], -1) # N x 1 x C
+            ns_out, last_hidden = self.ns_gru(ns_in_temp, last_hidden)
+            ns_proj_1_out = self.gelu(self.ns_proj_1(ns_out))
+            ns_logit = self.ns_proj_2(ns_proj_1_out)
+            ns_pred = ns_logit.argmax(dim=-1)
+            out[:, i] = ns_pred
+            action_emb = self.action_emb(ns_pred)
+            
+        return out
+
 
 class ControlModel(nn.Module):
     '''
