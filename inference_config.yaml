@@ -1,0 +1,28 @@
+model: default
+# checkpoint: checkpoints/control/09-15-16-32-11-epoch179.pt
+checkpoint: checkpoints/convstack/08-29-20-47-18-epoch113.pt
+# checkpoint: checkpoints/osumodel.pt
+audio_fn: tests/sh.mp3
+bpm: 117
+offset: 0
+difficulty: 2.7
+output_title: Superhuman
+output_version: Normal
+
+hyperparams:
+  bp_emb_dim: 32
+  bn_emb_dim: 16
+  diff_emb_dim: 16
+  np_hidden_size: 256
+  np_num_layers: 2
+  ns_pre_proj_size: 32
+  ns_hidden_size: 256
+  ns_num_layers: 2
+  action_emb_dim: 32
+  np_fl_gamma: 2
+  np_fl_weight: 0.8
+  ns_fl_gamma: 3
+  ns_fl_weight: 0.5
+  learning_rate: 0.0005
+  batch_size: 24
+  num_epochs: 1

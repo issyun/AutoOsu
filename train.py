@@ -180,7 +180,7 @@ class Trainer():
             wandb.finish()
 
 
-@hydra.main(version_base=None, config_path='.', config_name='config')
+@hydra.main(version_base=None, config_path='.', config_name='train_config')
 def main(config: DictConfig):
     experiment_config = config.experiment_config
     hyperparams = config.hyperparams
