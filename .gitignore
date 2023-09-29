@@ -3,4 +3,7 @@ osu_dataset/
 __pycache__/
 wandb/
 outputs/
-checkpoints/convstack/unused/
+tests/
+checkpoints/convstack/
+checkpoints/control/
+checkpoints/default/

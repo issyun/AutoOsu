@@ -1,7 +1,5 @@
 model: default
-# checkpoint: checkpoints/control/09-15-16-32-11-epoch179.pt
-checkpoint: checkpoints/convstack/08-29-20-47-18-epoch113.pt
-# checkpoint: checkpoints/osumodel.pt
+checkpoint: checkpoints/osu_model_v2.pt
 audio_fn: tests/sh.mp3
 bpm: 117
 offset: 0
